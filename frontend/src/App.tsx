@@ -9,6 +9,7 @@ function App() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [amount, setAmount] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
   fetch("http://127.0.0.1:8000/budget")
@@ -32,20 +33,30 @@ function App() {
 }, []);
 
   const transferMoney = () => {
-    if (!from || !to || !amount) {
-      alert("Please fill all fields");
-      return;
-    }
+  // existing code
+};
 
-    alert(`₹${amount} transferred from ${from} to ${to}`);
+const transactions = [
+  { from: "Saloni", to: "Anwesha", amount: 1000, status: "Success" },
+  { from: "Aman", to: "Priya", amount: 500, status: "Success" },
+];
 
-    setFrom("");
-    setTo("");
-    setAmount("");
-  };
+const filteredTransactions = transactions.filter(
+  (t) =>
+    t.from.toLowerCase().includes(search.toLowerCase()) ||
+    t.to.toLowerCase().includes(search.toLowerCase())
+);
 
-  return (
-    <div className="container">
+const exportTransactions = () => {
+  alert("Transactions Exported Successfully");
+};
+
+const editTransaction = () => {
+  alert("Edit Transaction");
+};
+
+return (
+  <div className="container">
       <h1>💰 FinFlow 💰</h1>
       <p className="subtitle">Personal Finance & Expense Manager</p>
 
@@ -105,10 +116,21 @@ function App() {
 
       <div className="history">
         <h2>Recent Transactions</h2>
+        <input
+          type="text"
+          placeholder="Search Transactions"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <br />
+        <br />
+        <br />
+        <br />
 
         <table>
           <thead>
             <tr>
+              <th>Edit</th>
               <th>From</th>
               <th>To</th>
               <th>Amount</th>
@@ -116,21 +138,19 @@ function App() {
             </tr>
           </thead>
 
-          <tbody>
-            <tr>
-              <td>Saloni</td>
-              <td>Anwesha</td>
-              <td>₹1000</td>
-              <td>✅ Success</td>
-            </tr>
-
-            <tr>
-              <td>Aman</td>
-              <td>Priya</td>
-              <td>₹500</td>
-              <td>✅ Success</td>
-            </tr>
-          </tbody>
+         <tbody>
+  {filteredTransactions.map((t, index) => (
+    <tr key={index}>
+      <td>{t.from}</td>
+      <td>{t.to}</td>
+      <td>₹{t.amount}</td>
+      <td>✅ {t.status}</td>
+      <td>
+        <button onClick={editTransaction}>Edit</button>
+      </td>
+    </tr>
+  ))}
+</tbody>
         </table>
       </div>
     </div>
