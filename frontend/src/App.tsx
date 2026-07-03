@@ -3,19 +3,33 @@ import { useEffect, useState } from "react";
 
 function App() {
   const [accounts, setAccounts] = useState<any[]>([]);
+  const [budget, setBudget] = useState(0);
+  const [spent, setSpent] = useState(0);
+  const [remaining, setRemaining] = useState(0);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [amount, setAmount] = useState("");
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/accounts")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setAccounts(data);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+  fetch("http://127.0.0.1:8000/budget")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Budget API:", data);
+
+      setBudget(Number(data.totalBudget) || 0);
+      setSpent(Number(data.spent) || 0);
+      setRemaining(Number(data.remaining) || 0);
+    })
+    .catch((err) => console.error("Budget Error:", err));
+
+  fetch("http://127.0.0.1:8000/accounts")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Accounts API:", data);
+      setAccounts(data);
+    })
+    .catch((err) => console.error("Accounts Error:", err));
+}, []);
 
   const transferMoney = () => {
     if (!from || !to || !amount) {
@@ -43,7 +57,25 @@ function App() {
             : "Loading..."}
         </h1>
       </div>
+    <div className="balance-card">
+  <h2>📊 Monthly Budget</h2>
 
+  <p>Total Budget: ₹{budget}</p>
+  <p>Spent: ₹{spent}</p>
+  <p>Remaining: ₹{remaining}</p>
+
+  <progress
+    value={spent}
+    max={budget}
+    style={{ width: "100%", height: "20px" }}
+  />
+
+  {remaining <= budget * 0.2 && (
+    <p style={{ color: "red", marginTop: "10px" }}>
+      ⚠️ Budget Limit Reached
+    </p>
+  )}
+</div>
       <div className="transfer-box">
         <h2>Transfer Money</h2>
 
